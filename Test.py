@@ -44,6 +44,16 @@ Text = Content.read().lower()
 # soup = BeautifulSoup(Text)
 
 
+def check_file(Filelist, logfile):
+    Dic = "Data/"
+    for f in Filelist:
+        print("Checking file", f , "which is the", Filelist.index(f), "file in",len(Filelist))
+        soup = BeautifulSoup(open(Dic + f).read().lower())
+        itemList = soup.find_all("span")
+        conStr = "".join(item.text for item in itemList)
+        newsList = str.split(conStr,"load-date")
+
+
 
 soup = BeautifulSoup(open("3M CO_1.HTML").read().lower())
 
@@ -58,6 +68,22 @@ newsList = str.split(conStr,"load-date")
 len(newsList)
 
 # newsList = newsList.encode("GBK", "ignore")
+import re
+str = "ADOBE_3"
+str = "ABBOTT Lab abc def.HTML"
+str = "Actavis.HTML"
+str = "CAMERON INTERNATIONAL CORP"
+str = "CABOT OIL & GAS CORP"
+str = "BANK OF AMERICA CORP"
+str = "BANK OF NEW YORK MELLON CORP"
+try:
+    FileName = re.search(r'(\w+\s*\w*\s*\w*\s*\w*)[_,\s,.]',str)
+    CompanyAbbName = FileName.group(1).lower()
+except:
+    pass
+
+
+
 
 
 newsList[0]

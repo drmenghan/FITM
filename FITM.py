@@ -14,7 +14,7 @@ from datetime import datetime
 from difflib import SequenceMatcher
 from dateutil.parser import parse
 from bs4 import BeautifulSoup
-
+# from withaop import trace
 
 
 class CompanyLeader(object):
@@ -25,23 +25,21 @@ class CompanyLeader(object):
     Title = ""
     CompanyName = ""
     NumOfNews = 0
+    NewsList = []
     NewsCompanyName = ""
     Year = 0
 
 
 
 class Company500(object):
-    LeaderList = []
-    def __init__(self, name):
-        self.name = name
-        self.numofleader = 0
-        #self.LeaderList = []
 
-    def set_numofleader(self, numofleader):
-        self.numofleader = numofleader
 
-    def add_Leader(self, leader):
-        self.LeaderList.append(leader)
+    CompanyLeaderList = []
+    CompanyName = ""
+    CompanyNewsList = []
+    NumOfNews = 0
+
+
 
 
 class Tee(object):
@@ -162,7 +160,7 @@ def get_filelist(mainDirectory, logfile):
     sys.stdout = original
     return result
 
-def get_leader_list(XLSFile, logfile):
+def build_leader_company_list(XLSFile, logfile):
     """
     #Build questions buckets
     :param XLSFile:
@@ -173,13 +171,14 @@ def get_leader_list(XLSFile, logfile):
     original = sys.stdout
     sys.stdout = Tee(sys.stdout, log)
     print("\nGeting leaders list from Excel.\n---\t",get_time(),"\t---")
-    sys.stdout = sys.stdout
+    sys.stdout = original
 
-    LeaderList = []
+    WholeLeaderList = []
     CompanyList = []
     book = xlrd.open_workbook(XLSFile)
     # xlrd.
     sh = book.sheet_by_index(0)
+    # sh = book.sheet_by_index(1)
 
     # text = sh.cell_value(1, 10)
     # int(text)
@@ -190,6 +189,7 @@ def get_leader_list(XLSFile, logfile):
     # num_rows = 200
     num_cells = sh.ncols - 1
     curr_row = 1
+    flag = 1 #Old Company
     while curr_row < num_rows:
         leader = CompanyLeader()
         leader.CompanyName = str(sh.cell_value(curr_row, 5)).lower()
@@ -198,26 +198,55 @@ def get_leader_list(XLSFile, logfile):
         leader.LastName = str(sh.cell_value(curr_row, 3)).lower()
         leader.Title = str(sh.cell_value(curr_row, 6)).lower()
         leader.Year = int(sh.cell_value(curr_row, 10))
-        LeaderList.append(leader)
+        WholeLeaderList.append(leader)
 
-        print("Company Name:", leader.CompanyName)
-        print("Full Name:", leader.FullName)
-        print("Title:", leader.Title)
-        print("row number",curr_row)
+        if(len(CompanyList)==0):
+            companyFirst = Company500()
+            companyFirst.CompanyName = leader.CompanyName
+            companyFirst.CompanyLeaderList.append(leader)
+            print("Add leader",leader.FullName,"to company:",companyFirst.CompanyName)
+            CompanyList.append(companyFirst)
+            print("Add the first company")
+        else:
+            for c in CompanyList:
+                if(c.CompanyName == leader.CompanyName):
+                    flag = 0 #Exist same name company
+                    c.CompanyLeaderList.append(leader)
+                    print("Add leader",leader.FullName,"to company:",c.CompanyName)
+                    break
+                    # print("Exist company",leader.CompanyName)
+                    # print("i=",i)
+                # else:
+                #     flag = 1
+
+            if(flag == 1):
+                companyNew = Company500()
+
+                companyNew.CompanyName = leader.CompanyName
+                companyNew.CompanyLeaderList.append(leader)
+                print("Add leader",leader.FullName,"to company:",companyNew.CompanyName)
+                CompanyList.append(companyNew)
+                # print("Add one company",company.CompanyName)
+                # flag = 0
+            else:
+                flag =1
+        # print("Company Name:", leader.CompanyName)
+        # print("Full Name:", leader.FullName)
+        # print("Title:", leader.Title)
+        # print("row number",curr_row)
         curr_row = curr_row + 1
-
-
 
     sys.stdout = Tee(sys.stdout, log)
 
     print("---\tTotal", '{:.2f}'.format(time.time()-start_time), "seconds used.\t---")
     print("---\tThere are", num_rows-1, "company leaders in the Excel.\t---")
+    print("---\tThere are", len(CompanyList), "companies in the Excel.\t---")
     log.close()
     sys.stdout = original
-    return LeaderList
+    return WholeLeaderList, CompanyList
 
 
-def
+
 
 
 def main():
@@ -225,16 +254,33 @@ def main():
     Main Function Control the Whole Work Flow of Analysis
     :return:
     """
-logfile = "0727.txt"
-DataDic = "DATA/"
-FileList = get_filelist(DataDic,logfile)
-# [FileList[i] for i in range(len(FileList))]
-XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
+    logfile = "0729.txt"
+    DataDic = "DATA/"
+    # FileList = get_filelist(DataDic,logfile)
+    # [FileList[i] for i in range(len(FileList))]
+    XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
 
-LeaderList = get_leader_list(XLSFile,logfile)
+    leaderFile = "LeaderList.pkl"
+    companyFile = "CompanyList.pkl"
+
+    LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile)
+
+    # save_object(LeaderList,leaderFile,logfile)
+    # save_object(companyFile,leaderFile,logfile)
+    #
+    len(LeaderList)
+    len(CompanyList)
+    CompanyList[10].CompanyLeaderList
+    # for c in CompanyList[:100]:
+    #     print(c.CompanyName)
+    #     print(len(c.LeaderList))
+    #     print("*********")
+
+    len(CompanyList[1].CompanyLeaderList)
 
 
-
+# len(LeaderList)
+# len(CompanyList)
 
 if __name__ == "__main__":
     main()
