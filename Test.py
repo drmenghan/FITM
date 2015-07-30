@@ -42,7 +42,11 @@ Text = Content.read().lower()
 
 # Text.lower()
 # soup = BeautifulSoup(Text)
+leaderFile = "LeaderList.pkl"
+companyFile = "CompanyList.pkl"
 
+FLeaderList = load_object(leaderFile,logfile)
+FCompanyList = load_object(companyFile,logfile)
 
 def check_file(Filelist, logfile):
     Dic = "Data/"

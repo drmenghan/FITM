@@ -274,8 +274,11 @@ def main():
     LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile)
 
     # save_object(LeaderList,leaderFile,logfile)
-    # save_object(companyFile,leaderFile,logfile)
+    # save_object(CompanyList,companyFile,logfile)
     #
+
+    FLeaderList = load_object(leaderFile,logfile)
+    FCompanyList = load_object(companyFile,logfile)
     len(LeaderList)
     len(CompanyList)
     CompanyList[10].CompanyLeaderList
