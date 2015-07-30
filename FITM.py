@@ -18,6 +18,9 @@ from bs4 import BeautifulSoup
 
 
 class CompanyLeader(object):
+    """
+    Define Leader
+    """
 
     LastName = ""
     FirstName = ""
@@ -32,14 +35,14 @@ class CompanyLeader(object):
 
 
 class Company500(object):
-
+    """
+    Define Company
+    """
 
     CompanyLeaderList = []
     CompanyName = ""
     CompanyNewsList = []
     NumOfNews = 0
-
-
 
 
 class Tee(object):
@@ -70,6 +73,11 @@ def get_time():
 
 
 def get_running_time(logfile):
+    """
+    Get formatted time
+    :param logfile:
+    :return:
+    """
     start_time = time.time()
     original = sys.stdout
     log = open(logfile, 'a')
@@ -170,7 +178,7 @@ def build_leader_company_list(XLSFile, logfile):
     log = open(logfile, 'a')
     original = sys.stdout
     sys.stdout = Tee(sys.stdout, log)
-    print("\nGeting leaders list from Excel.\n---\t",get_time(),"\t---")
+    print("\nGetting leaders list from Excel.\n---\t",get_time(),"\t---")
     sys.stdout = original
 
     WholeLeaderList = []
