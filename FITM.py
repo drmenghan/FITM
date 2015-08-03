@@ -21,16 +21,18 @@ class CompanyLeader(object):
     """
     Define Leader
     """
+    def __init__(self):
+        self.LastName = ""
 
-    LastName = ""
-    FirstName = ""
-    FullName = ""
-    Title = ""
-    CompanyName = ""
-    NumOfNews = 0
-    NewsList = []
-    NewsCompanyName = ""
-    Year = 0
+        self.LastName = ""
+        self.FirstName = ""
+        self.FullName = ""
+        self.Title = ""
+        self.CompanyName = ""
+        self.NumOfNews = 0
+        self.NewsList = []
+        self.NewsCompanyName = ""
+        self.Year = 0
 
 
 
@@ -38,11 +40,11 @@ class Company500(object):
     """
     Define Company
     """
-
-    CompanyLeaderList = []
-    CompanyName = ""
-    CompanyNewsList = []
-    NumOfNews = 0
+    def __init__(self):
+        self.LeaderList = []
+        self.CompanyName = ""
+        self.NewsList = []
+        self.NumOfNews = 0
 
 
 class Tee(object):
@@ -181,12 +183,12 @@ def build_leader_company_list(XLSFile, logfile):
     print("\nGetting leaders list from Excel.\n---\t",get_time(),"\t---")
     sys.stdout = original
 
-    WholeLeaderList = []
+    LeaderList = []
     CompanyList = []
     book = xlrd.open_workbook(XLSFile)
     # xlrd.
-    sh = book.sheet_by_index(0)
-    # sh = book.sheet_by_index(1)
+    # sh = book.sheet_by_index(0)
+    sh = book.sheet_by_index(1)
 
     # text = sh.cell_value(1, 10)
     # int(text)
@@ -206,20 +208,20 @@ def build_leader_company_list(XLSFile, logfile):
         leader.LastName = str(sh.cell_value(curr_row, 3)).lower()
         leader.Title = str(sh.cell_value(curr_row, 6)).lower()
         leader.Year = int(sh.cell_value(curr_row, 10))
-        WholeLeaderList.append(leader)
+        LeaderList.append(leader)
 
         if(len(CompanyList)==0):
-            companyFirst = Company500()
-            companyFirst.CompanyName = leader.CompanyName
-            companyFirst.CompanyLeaderList.append(leader)
-            print("Add leader",leader.FullName,"to company:",companyFirst.CompanyName)
-            CompanyList.append(companyFirst)
+            company = Company500()
+            company.CompanyName = leader.CompanyName
+            company.LeaderList.append(leader)
+            print("Add leader",leader.FullName,"to company:",company.CompanyName)
+            CompanyList.append(company)
             print("Add the first company")
         else:
             for c in CompanyList:
                 if(c.CompanyName == leader.CompanyName):
                     flag = 0 #Exist same name company
-                    c.CompanyLeaderList.append(leader)
+                    c.LeaderList.append(leader)
                     print("Add leader",leader.FullName,"to company:",c.CompanyName)
                     break
                     # print("Exist company",leader.CompanyName)
@@ -228,12 +230,12 @@ def build_leader_company_list(XLSFile, logfile):
                 #     flag = 1
 
             if(flag == 1):
-                companyNew = Company500()
+                company = Company500()
 
-                companyNew.CompanyName = leader.CompanyName
-                companyNew.CompanyLeaderList.append(leader)
-                print("Add leader",leader.FullName,"to company:",companyNew.CompanyName)
-                CompanyList.append(companyNew)
+                company.CompanyName = leader.CompanyName
+                company.LeaderList.append(leader)
+                print("Add leader",leader.FullName,"to company:",company.CompanyName)
+                CompanyList.append(company)
                 # print("Add one company",company.CompanyName)
                 # flag = 0
             else:
@@ -251,7 +253,7 @@ def build_leader_company_list(XLSFile, logfile):
     print("---\tThere are", len(CompanyList), "companies in the Excel.\t---")
     log.close()
     sys.stdout = original
-    return WholeLeaderList, CompanyList
+    return LeaderList, CompanyList
 
 
 
@@ -277,15 +279,15 @@ def main():
     # save_object(CompanyList,companyFile,logfile)
     #
 
-    FLeaderList = load_object(leaderFile,logfile)
-    FCompanyList = load_object(companyFile,logfile)
+    # FLeaderList = load_object(leaderFile,logfile)
+    # FCompanyList = load_object(companyFile,logfile)
     len(LeaderList)
     len(CompanyList)
-    CompanyList[10].CompanyLeaderList
-    # for c in CompanyList[:100]:
-    #     print(c.CompanyName)
-    #     print(len(c.LeaderList))
-    #     print("*********")
+    CompanyList[10].LeaderList
+    for c in CompanyList[-20:-1]:
+        print(c.CompanyName)
+        print(len(c.LeaderList))
+        print("*********")
 
     len(CompanyList[1].CompanyLeaderList)
 
