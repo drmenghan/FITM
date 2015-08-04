@@ -170,7 +170,7 @@ def get_filelist(mainDirectory, logfile):
     sys.stdout = original
     return result
 
-def build_leader_company_list(XLSFile, logfile):
+def build_leader_company_list(XLSFile, logfile, sheetflag):
     """
     #Build questions buckets
     :param XLSFile:
@@ -188,7 +188,10 @@ def build_leader_company_list(XLSFile, logfile):
     book = xlrd.open_workbook(XLSFile)
     # xlrd.
     # sh = book.sheet_by_index(0)
-    sh = book.sheet_by_index(1)
+    # sh = book.sheet_by_index(1)
+
+    #flag = 0 is the small example, 1 is the whole file
+    sh = book.sheet_by_index(sheetflag)
 
     # text = sh.cell_value(1, 10)
     # int(text)
@@ -258,32 +261,83 @@ def build_leader_company_list(XLSFile, logfile):
 
 
 
+def check_file(Filelist, CompanyList, logfile):
+    Dic = "Data/"
+    start_time = time.time()
+
+    log = open(logfile, 'a')
+    original = sys.stdout
+    sys.stdout = Tee(sys.stdout, log)
+
+    for f in Filelist:
+        print("Checking file", f , "which is the", Filelist.index(f)+1, "file in",len(Filelist),"files.")
+        soup = BeautifulSoup(open(Dic + f).read().lower())
+        itemList = soup.find_all("span")
+        conStr = "".join(item.text for item in itemList)
+        newsList = str.split(conStr,"load-date")
+        try:
+            FileName = re.search(r'(\w+\s*\w*\s*\w*\s*\w*)[_,\s,.]',f)
+            CompanyAbbName = FileName.group(1).lower()
+            print("The Company Abb Name is:",CompanyAbbName)
+        except:
+            pass
+
+        for company in CompanyList:
+            print("Checking company:",company.CompanyName,"in the CompanyList.")
+            if get_similarity(CompanyAbbName,company.CompanyName)>0.75:
+                print("Find corresponding Company is",company.CompanyName)
+                for news in newsList:
+                    for leader in company.LeaderList:
+                        if (leader.LastName in news) or (leader.FirstName in news):
+                            print("Find out both last or first name in the news")
+                            leader.NewsList.append(news)
+                            leader.NumOfNews = leader.NumOfNews+1
+                            print("The leader's full name is", leader.FullName)
+                            print("The news of this leader is", leader.NumOfNews)
+
+    print("\n---\tFinished file analysis.\t---")
+    print("---\tTotal", '{:.2f}'.format(time.time()-start_time), "seconds used.\t---\n")
+    log.close()
+    sys.stdout = original
+
+
+
+
 
 def main():
     """
     Main Function Control the Whole Work Flow of Analysis
     :return:
     """
-    logfile = "0729.txt"
+    logfile = "0803.txt"
     DataDic = "DATA/"
-    # FileList = get_filelist(DataDic,logfile)
+    FileList = get_filelist(DataDic,logfile)
     # [FileList[i] for i in range(len(FileList))]
     XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
 
     leaderFile = "LeaderList.pkl"
     companyFile = "CompanyList.pkl"
 
-    LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile)
+    LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile,0)
 
-    # save_object(LeaderList,leaderFile,logfile)
-    # save_object(CompanyList,companyFile,logfile)
-    #
+
+    save_object(LeaderList,leaderFile,logfile)
+    save_object(CompanyList,companyFile,logfile)
+
+
+    FLeaderList = load_object(leaderFile,logfile)
+    FCompanyList = load_object(companyFile,logfile)
+
+
+    check_file(FileList,CompanyList,logfile)
+
+
 
     # FLeaderList = load_object(leaderFile,logfile)
     # FCompanyList = load_object(companyFile,logfile)
     len(LeaderList)
     len(CompanyList)
-    CompanyList[10].LeaderList
+    CompanyList[0].CompanyName
     for c in CompanyList[-20:-1]:
         print(c.CompanyName)
         print(len(c.LeaderList))
