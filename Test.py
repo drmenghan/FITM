@@ -44,6 +44,39 @@ Text = Content.read().lower()
 # soup = BeautifulSoup(Text)
 
 
+from textblob import TextBlob
+wiki = TextBlob("Python is a high-level, general-purpose programming language.")
+wiki.noun_phrases
+testimonial = TextBlob("Textblob is amazingly simple to use. What great fun!")
+testimonial.sentiment
+testimonial.sentiment.polarity
+
+zen = TextBlob("Beautiful is better than ugly.""Explicit is better than implicit.""Simple is better than complex.")
+
+zen.words
+zen.sentences
+
+for sentence in zen.sentences:
+    print(sentence.sentiment)
+
+len(zen.sentences)
+
+
+sentence = TextBlob('Use 4 spaces per indentation level.')
+sentence.words
+sentence.words[2].singularize()
+sentence.words[-1].singularize()
+
+from textblob import Word
+w = Word("octopi")
+w.lemmatize()
+
+w = Word("went")
+w.lemmatize("v")
+
+
+
+
 
 
 soup = BeautifulSoup(open("3M CO_1.HTML").read().lower())

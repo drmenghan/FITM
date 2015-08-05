@@ -261,8 +261,8 @@ def build_leader_company_list(XLSFile, logfile, sheetflag):
 
 
 
-def check_file(Filelist, CompanyList, logfile):
-    Dic = "Data/"
+def check_file(Filelist, CompanyList, Dic, logfile):
+    # Dic = "Data/"
     start_time = time.time()
 
     log = open(logfile, 'a')
@@ -283,22 +283,38 @@ def check_file(Filelist, CompanyList, logfile):
             pass
 
         for company in CompanyList:
-            print("Checking company:",company.CompanyName,"in the CompanyList.")
+
             if get_similarity(CompanyAbbName,company.CompanyName)>0.75:
+                print("Checking company:",company.CompanyName,"in the CompanyList.")
                 print("Find corresponding Company is",company.CompanyName)
                 for news in newsList:
                     for leader in company.LeaderList:
-                        if (leader.LastName in news) or (leader.FirstName in news):
-                            print("Find out both last or first name in the news")
+                        if (leader.LastName in news) and (leader.FirstName in news):
+                        # if (leader.LastName in news) or (leader.FirstName in news):
+                        #     print("Find out both last or first name in the news")
                             leader.NewsList.append(news)
                             leader.NumOfNews = leader.NumOfNews+1
-                            print("The leader's full name is", leader.FullName)
-                            print("The news of this leader is", leader.NumOfNews)
+                            # print("The leader's full name is", leader.FullName)
+                            # print("The news of this leader is", leader.NumOfNews)
+
+    NewLeaderList = []
+    for com in CompanyList:
+        for leader in com.LeaderList:
+            NewLeaderList.append(leader)
+    print("The size of the adjusted New LeaderList is".len(NewLeaderList))
+
+
+    save_object(NewLeaderList,"NewLeaderList.pkl",logfile)
+    save_object(CompanyList,"NewCompanyList.pkl",logfile)
 
     print("\n---\tFinished file analysis.\t---")
     print("---\tTotal", '{:.2f}'.format(time.time()-start_time), "seconds used.\t---\n")
     log.close()
     sys.stdout = original
+
+
+    return NewLeaderList
+
 
 
 
@@ -309,8 +325,11 @@ def main():
     Main Function Control the Whole Work Flow of Analysis
     :return:
     """
-    logfile = "0803.txt"
+    logfile = "0804.txt"
     DataDic = "DATA/"
+
+    DataDic = "H:/FI ANA/00_News Articles/"
+
     FileList = get_filelist(DataDic,logfile)
     # [FileList[i] for i in range(len(FileList))]
     XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
@@ -318,7 +337,8 @@ def main():
     leaderFile = "LeaderList.pkl"
     companyFile = "CompanyList.pkl"
 
-    LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile,0)
+    #Last parameter control the sample and the whole data 1 for whole
+    LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile,1)
 
 
     save_object(LeaderList,leaderFile,logfile)
@@ -329,10 +349,29 @@ def main():
     FCompanyList = load_object(companyFile,logfile)
 
 
-    check_file(FileList,CompanyList,logfile)
+
+
+    NewLeaderList = check_file(FileList,CompanyList,DataDic,logfile)
 
 
 
+
+
+
+    for com in CompanyList:
+        for leader in com.LeaderList:
+            NewLeaderList.append(leader)
+            if leader.NumOfNews>2:
+                print("The leader's full name is",leader.FullName,"has news",leader.NumOfNews,"with index:",com.LeaderList.index(leader),CompanyList.index(com))
+
+    CompanyList[5].LeaderList[14].NumOfNews
+
+    # len(NewLeaderList)
+
+    len(CompanyList[5].LeaderList[14].NewsList)
+    CompanyList[5].LeaderList[14].NewsList[1]
+
+print()
     # FLeaderList = load_object(leaderFile,logfile)
     # FCompanyList = load_object(companyFile,logfile)
     len(LeaderList)
