@@ -16,13 +16,15 @@ from dateutil.parser import parse
 from bs4 import BeautifulSoup
 # from withaop import trace
 
+# nltk.download()
+
 
 class CompanyLeader(object):
     """
     Define Leader
     """
     def __init__(self):
-        self.LastName = ""
+        # self.LastName = ""
 
         self.LastName = ""
         self.FirstName = ""
@@ -45,6 +47,18 @@ class Company500(object):
         self.CompanyName = ""
         self.NewsList = []
         self.NumOfNews = 0
+
+
+# class CompanyResult(object):
+#     """
+#     To supply the final result statistic
+#     """
+#     def __init__(self):
+#         self.LeaderList = []
+#         self.CompanyName = ""
+#         self.NewsList = []
+#         self.NumOfNews = 0
+#         self.
 
 
 class Tee(object):
@@ -316,6 +330,16 @@ def check_file(Filelist, CompanyList, Dic, logfile):
     return NewLeaderList
 
 
+# news = "1 of 2599 documentscopyright2013 morningstar, inc.\xa0u.s. executive compensation"
+def get_year(news):
+    try:
+        m = re.match(r'.*\S*\s*(20[01][0-9])',news[:200])
+        year = m.group(1)
+    except:
+        year = 0
+    return year
+
+# get_year(news)
 
 
 
@@ -325,7 +349,7 @@ def main():
     Main Function Control the Whole Work Flow of Analysis
     :return:
     """
-    logfile = "0804.txt"
+    logfile = "0821.txt"
     DataDic = "DATA/"
 
     DataDic = "H:/FI ANA/00_News Articles/"
@@ -334,9 +358,12 @@ def main():
     # [FileList[i] for i in range(len(FileList))]
     XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
 
-    leaderFile = "LeaderList.pkl"
-    companyFile = "CompanyList.pkl"
+    # leaderFile = "LeaderList.pkl"
 
+    # companyFile = "CompanyList.pkl"
+
+    leaderFile = r"E:\FI ANA\NewLeaderList.pkl"
+    companyFile = r"E:\FI ANA\NewCompanyList.pkl"
     #Last parameter control the sample and the whole data 1 for whole
     LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile,1)
 
@@ -349,20 +376,92 @@ def main():
     FCompanyList = load_object(companyFile,logfile)
 
 
+    yearlist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
+    for company in FCompanyList:
+        for leader in company.LeaderList:
+            if (leader.NumOfNews>0):
+                print("\t","\t",leader.FullName,"\t",company.CompanyName,"\t\t",leader.NumOfNews)
+                for news in leader.NewsList:
+                    try:
+                        year = eval(get_year(news))
+                        if (year in yearlist.keys()):
+                            # print(year)
+                            # print("Find year!")
+                            yearlist[year]+=1
+                    except:
+                        print("wrong",get_year(news))
 
-
-    NewLeaderList = check_file(FileList,CompanyList,DataDic,logfile)
-
-
-
-
+                for key,val in yearlist.items():
+                    if val != 0:
+                        print(key,"\t",leader.FullName,"\t",company.CompanyName,"\t",val)
+            for key,val in yearlist.items():
+                yearlist[key]=0
+    print("text")
 
 
     for com in CompanyList:
         for leader in com.LeaderList:
             NewLeaderList.append(leader)
-            if leader.NumOfNews>2:
+            if leader.NumOfNews>1:
                 print("The leader's full name is",leader.FullName,"has news",leader.NumOfNews,"with index:",com.LeaderList.index(leader),CompanyList.index(com))
+                for news in leader.NewsList:
+                    year = get_year(news)
+                    if (year!=0):
+                        yearlist[year]+=1
+
+                for key,val in yearlist.items():
+                    if val != 0:
+                        print(key,val)
+
+
+
+    FCompanyList[1].LeaderList[0].NewsList[1]
+
+    NewLeaderList = check_file(FileList,CompanyList,DataDic,logfile)
+
+    news = "1 of 2599 documentscopyright 2013 morningstar, inc.\xa0u.s. executive compensation"
+    news = ": may 17, 2011language: englishgraphic: 3m today named inge thulin its new chief operating"
+    m = re.match(r'20[01][0-9]',news)
+    m.group(0)
+
+    m = re.match(r'(20[01][0-9])',"sadfsda 2013")
+    m = re.match(r'\S*(20[01][0-9])',"2556 2013 1234546")
+
+    re.match(r'.*\S*\s(20[01][0-9])',"s1 of 2599 documentscopyright, 2103morn").group(1)
+
+
+
+
+
+
+
+
+
+    yearlist = [2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013]
+    yearlist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
+
+
+    for com in CompanyList:
+        for leader in com.LeaderList:
+            NewLeaderList.append(leader)
+            if leader.NumOfNews>1:
+                print("The leader's full name is",leader.FullName,"has news",leader.NumOfNews,"with index:",com.LeaderList.index(leader),CompanyList.index(com))
+                for news in leader.NewsList:
+                    year = get_year(news)
+                    if (year!=0):
+                        yearlist[year]+=1
+
+                for key,val in yearlist.items():
+                    if val != 0:
+                        print(key,val)
+
+
+
+
+
+
+
+
 
     CompanyList[5].LeaderList[14].NumOfNews
 
@@ -371,9 +470,10 @@ def main():
     len(CompanyList[5].LeaderList[14].NewsList)
     CompanyList[5].LeaderList[14].NewsList[1]
 
-print()
-    # FLeaderList = load_object(leaderFile,logfile)
-    # FCompanyList = load_object(companyFile,logfile)
+    print()
+# FLeaderList = load_object(leaderFile,logfile)
+
+# FCompanyList = load_object(companyFile,logfile)
     len(LeaderList)
     len(CompanyList)
     CompanyList[0].CompanyName
@@ -383,6 +483,7 @@ print()
         print("*********")
 
     len(CompanyList[1].CompanyLeaderList)
+
 
 
 # len(LeaderList)
