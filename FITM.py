@@ -14,6 +14,7 @@ from datetime import datetime
 from difflib import SequenceMatcher
 from dateutil.parser import parse
 from bs4 import BeautifulSoup
+from textblob import TextBlob
 # from withaop import trace
 
 # nltk.download()
@@ -341,7 +342,9 @@ def get_year(news):
 
 # get_year(news)
 
-
+def get_score(text):
+    blob = TextBlob(text)
+    return blob.sentiment.polarity
 
 
 def main():
@@ -349,7 +352,7 @@ def main():
     Main Function Control the Whole Work Flow of Analysis
     :return:
     """
-    logfile = "0821.txt"
+    logfile = "0827.txt"
     DataDic = "DATA/"
 
     DataDic = "H:/FI ANA/00_News Articles/"
@@ -375,12 +378,15 @@ def main():
     FLeaderList = load_object(leaderFile,logfile)
     FCompanyList = load_object(companyFile,logfile)
 
-
+    log = open("Final Result.txt", 'a')
+    original = sys.stdout
+    sys.stdout = Tee(sys.stdout, log)
     yearlist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
+    scorelist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
     for company in FCompanyList:
         for leader in company.LeaderList:
             if (leader.NumOfNews>0):
-                print("\t","\t",leader.FullName,"\t",company.CompanyName,"\t\t",leader.NumOfNews)
+                # print("\t","\t",leader.FullName,"\t",company.CompanyName,"\t\t",leader.NumOfNews)
                 for news in leader.NewsList:
                     try:
                         year = eval(get_year(news))
@@ -388,14 +394,21 @@ def main():
                             # print(year)
                             # print("Find year!")
                             yearlist[year]+=1
+                            scorelist[year] += get_score(news)
                     except:
                         print("wrong",get_year(news))
 
                 for key,val in yearlist.items():
                     if val != 0:
-                        print(key,"\t",leader.FullName,"\t",company.CompanyName,"\t",val)
+                        print(key,"\t",leader.FullName,"\t",company.CompanyName,"\t",val,"\t",scorelist[key])
             for key,val in yearlist.items():
                 yearlist[key]=0
+                scorelist[key]=0
+
+
+    sys.stdout = original
+
+
     print("text")
 
 
@@ -415,7 +428,7 @@ def main():
 
 
 
-    FCompanyList[1].LeaderList[0].NewsList[1]
+    FCompanyList[0].LeaderList[0].NewsList[1]
 
     NewLeaderList = check_file(FileList,CompanyList,DataDic,logfile)
 
