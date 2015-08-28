@@ -2,19 +2,15 @@ __author__ = 'Meng'
 import os
 import re
 import sys
-import xlrd
 import time
-import nltk
 import pickle
-import string
-import datetime
-import logging
-import shutil
-from datetime import datetime
 from difflib import SequenceMatcher
-from dateutil.parser import parse
+
+import xlrd
 from bs4 import BeautifulSoup
 from textblob import TextBlob
+
+
 # from withaop import trace
 
 # nltk.download()
@@ -291,7 +287,8 @@ def check_file(Filelist, CompanyList, Dic, logfile):
         conStr = "".join(item.text for item in itemList)
         newsList = str.split(conStr,"load-date")
         try:
-            FileName = re.search(r'(\w+\s*\w*\s*\w*\s*\w*)[_,\s,.]',f)
+            # Retest if doesn't work well
+            FileName = re.search(r'(\w+\s*\w*\s*\w*\s*\w*)[_\s.]', f)
             CompanyAbbName = FileName.group(1).lower()
             print("The Company Abb Name is:",CompanyAbbName)
         except:
@@ -316,7 +313,7 @@ def check_file(Filelist, CompanyList, Dic, logfile):
     for com in CompanyList:
         for leader in com.LeaderList:
             NewLeaderList.append(leader)
-    print("The size of the adjusted New LeaderList is".len(NewLeaderList))
+    print("The size of the adjusted New LeaderList is", len(NewLeaderList))
 
 
     save_object(NewLeaderList,"NewLeaderList.pkl",logfile)
@@ -331,7 +328,7 @@ def check_file(Filelist, CompanyList, Dic, logfile):
     return NewLeaderList
 
 
-# news = "1 of 2599 documentscopyright2013 morningstar, inc.\xa0u.s. executive compensation"
+
 def get_year(news):
     try:
         m = re.match(r'.*\S*\s*(20[01][0-9])',news[:200])
@@ -378,6 +375,12 @@ def main():
     FLeaderList = load_object(leaderFile,logfile)
     FCompanyList = load_object(companyFile,logfile)
 
+    """
+
+    Final Analysis Begin
+
+    """
+
     log = open("Final Result.txt", 'a')
     original = sys.stdout
     sys.stdout = Tee(sys.stdout, log)
@@ -408,99 +411,12 @@ def main():
 
     sys.stdout = original
 
+    """
 
-    print("text")
+    Final Analysis End
 
+    """
 
-    for com in CompanyList:
-        for leader in com.LeaderList:
-            NewLeaderList.append(leader)
-            if leader.NumOfNews>1:
-                print("The leader's full name is",leader.FullName,"has news",leader.NumOfNews,"with index:",com.LeaderList.index(leader),CompanyList.index(com))
-                for news in leader.NewsList:
-                    year = get_year(news)
-                    if (year!=0):
-                        yearlist[year]+=1
-
-                for key,val in yearlist.items():
-                    if val != 0:
-                        print(key,val)
-
-
-
-    FCompanyList[0].LeaderList[0].NewsList[1]
-
-    NewLeaderList = check_file(FileList,CompanyList,DataDic,logfile)
-
-    news = "1 of 2599 documentscopyright 2013 morningstar, inc.\xa0u.s. executive compensation"
-    news = ": may 17, 2011language: englishgraphic: 3m today named inge thulin its new chief operating"
-    m = re.match(r'20[01][0-9]',news)
-    m.group(0)
-
-    m = re.match(r'(20[01][0-9])',"sadfsda 2013")
-    m = re.match(r'\S*(20[01][0-9])',"2556 2013 1234546")
-
-    re.match(r'.*\S*\s(20[01][0-9])',"s1 of 2599 documentscopyright, 2103morn").group(1)
-
-
-
-
-
-
-
-
-
-    yearlist = [2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013]
-    yearlist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
-
-
-    for com in CompanyList:
-        for leader in com.LeaderList:
-            NewLeaderList.append(leader)
-            if leader.NumOfNews>1:
-                print("The leader's full name is",leader.FullName,"has news",leader.NumOfNews,"with index:",com.LeaderList.index(leader),CompanyList.index(com))
-                for news in leader.NewsList:
-                    year = get_year(news)
-                    if (year!=0):
-                        yearlist[year]+=1
-
-                for key,val in yearlist.items():
-                    if val != 0:
-                        print(key,val)
-
-
-
-
-
-
-
-
-
-    CompanyList[5].LeaderList[14].NumOfNews
-
-    # len(NewLeaderList)
-
-    len(CompanyList[5].LeaderList[14].NewsList)
-    CompanyList[5].LeaderList[14].NewsList[1]
-
-    print()
-# FLeaderList = load_object(leaderFile,logfile)
-
-# FCompanyList = load_object(companyFile,logfile)
-    len(LeaderList)
-    len(CompanyList)
-    CompanyList[0].CompanyName
-    for c in CompanyList[-20:-1]:
-        print(c.CompanyName)
-        print(len(c.LeaderList))
-        print("*********")
-
-    len(CompanyList[1].CompanyLeaderList)
-
-
-
-# len(LeaderList)
-# len(CompanyList)
 
 if __name__ == "__main__":
     main()
