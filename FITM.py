@@ -1,13 +1,16 @@
 __author__ = 'Meng'
 import os
+import pickle
 import re
 import sys
 import time
-import pickle
 from difflib import SequenceMatcher
 
 import xlrd
 from bs4 import BeautifulSoup
+# pip install -U textblob
+
+
 from textblob import TextBlob
 
 
@@ -344,32 +347,42 @@ def get_score(text):
     return blob.sentiment.polarity
 
 
+def ifKeyword(key, news):
+    try:
+        if (news.find(key)):
+            return True
+        return False
+    except:
+        return False
+
 def main():
     """
     Main Function Control the Whole Work Flow of Analysis
     :return:
     """
-    logfile = "0827.txt"
-    DataDic = "DATA/"
+    logfile = r"D:/LOG20160102.txt"
+    # DataDic = "DATA/"
 
-    DataDic = "H:/FI ANA/00_News Articles/"
+    # DataDic = "H:/FI ANA/00_News Articles/"
 
-    FileList = get_filelist(DataDic,logfile)
+    #FileList = get_filelist(DataDic,logfile)
     # [FileList[i] for i in range(len(FileList))]
-    XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
+    #XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
 
     # leaderFile = "LeaderList.pkl"
 
     # companyFile = "CompanyList.pkl"
 
-    leaderFile = r"E:\FI ANA\NewLeaderList.pkl"
-    companyFile = r"E:\FI ANA\NewCompanyList.pkl"
+    # leaderFile = r"F:\FI ANA\NewLeaderList.pkl"
+    # companyFile = r"F:\FI ANA\NewCompanyList.pkl"
+    # leaderFile = r"D:\NewLeaderList.pkl"
+    companyFile = r"D:\NewCompanyList.pkl"
+    XLSFile = "Execlis SP500t_2003_2013_Lnm1.xls"
     #Last parameter control the sample and the whole data 1 for whole
-    LeaderList, CompanyList = build_leader_company_list(XLSFile,logfile,1)
+    LeaderList, CompanyList = build_leader_company_list(XLSFile, logfile, 1)
 
-
-    save_object(LeaderList,leaderFile,logfile)
-    save_object(CompanyList,companyFile,logfile)
+    # save_object(LeaderList,leaderFile,logfile)
+    #save_object(CompanyList,companyFile,logfile)
 
 
     FLeaderList = load_object(leaderFile,logfile)
@@ -381,35 +394,58 @@ def main():
 
     """
 
-    log = open("Final Result.txt", 'a')
+    log = open(r"D:\Final Result20160102-2.txt", 'a')
     original = sys.stdout
     sys.stdout = Tee(sys.stdout, log)
     yearlist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
-    scorelist = {2003:0,2004:0,2005:0,2006:0,2007:0,2008:0,2009:0,2010:0,2011:0,2012:0,2013:0}
+    scorelist = {2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0, 2013: 0}
+    posscorelist = {2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0, 2013: 0}
+    negscorelist = {2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0, 2013: 0}
+    keywords = ["scandal"]
+    #, "fraud", "false statement", "financial crime", "lawsuit", "insider-trading", "falsify"]
     for company in FCompanyList:
         for leader in company.LeaderList:
-            if (leader.NumOfNews>0):
-                # print("\t","\t",leader.FullName,"\t",company.CompanyName,"\t\t",leader.NumOfNews)
-                for news in leader.NewsList:
-                    try:
-                        year = eval(get_year(news))
-                        if (year in yearlist.keys()):
-                            # print(year)
-                            # print("Find year!")
-                            yearlist[year]+=1
-                            scorelist[year] += get_score(news)
-                    except:
-                        print("wrong",get_year(news))
 
+            if (leader.NumOfNews > 0):
+                # print("\t","\t",leader.FullName,"\t",company.CompanyName,"\t\t",leader.NumOfNews)
+                for keyword in keywords:
+                    for news in leader.NewsList:
+                        # try:
+                        #     year = eval(get_year(news))
+                        #     if (year in yearlist.keys()):
+                        #         # print(year)
+                        #         # print("Find year!")
+                        #         yearlist[year]+=1
+                        #
+                        #         scorelist[year] += get_score(news)
+                        #         if(get_score(news)>0):
+                        #             posscorelist[year]+=1
+                        #         else:
+                        #             negscorelist[year]+=1
+                        # except:
+                        #     print("wrong",get_year(news))
+
+
+                        if (ifKeyword(keyword, news)):
+                            print("Sensitive Word \"" + keyword + "\":\n")
+                            try:
+                                print(leader.FullName, "\t", company.CompanyName, "\t", eval(get_year(news)))
+                                print(news)
+                            except:
+                                print("Code Wrong")
+                                # for key,val in yearlist.items():
+                                #     #True#val != 0:
+                                #     if (key==2003):
+                                #         print(key,"\t",leader.FullName,"\t",company.CompanyName,"\t",val,"\t",scorelist[key],"\t",posscorelist[key],"\t",negscorelist[key])
                 for key,val in yearlist.items():
-                    if val != 0:
-                        print(key,"\t",leader.FullName,"\t",company.CompanyName,"\t",val,"\t",scorelist[key])
-            for key,val in yearlist.items():
-                yearlist[key]=0
-                scorelist[key]=0
+                    yearlist[key] = 0
+                    scorelist[key] = 0
+                    posscorelist[key] = 0
+                    negscorelist[key] =0
 
 
     sys.stdout = original
+    log.close()
 
     """
 
