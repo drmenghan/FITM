@@ -1,5 +1,5 @@
 # FITM
-FITextMining
+
 Public business information could increase the efficiency and fairness of the securities market for the benefit of investors, corporations, and the economy.
 Since 1934, the U.S. \textbf{S}ecurities and \textbf{E}xchange \textbf{C}ommission (SEC)\footnote{\url{https://www.sec.gov/about.shtml}} has required disclosure in forms and documents.
 SEC's EDGAR \footnote{Electronic Data Gathering, Analysis, and Retrieval system (EDGAR)\\\url{https://www.sec.gov/edgar/searchedgar/webusers.htm}}, which is a data management system of SEC, began to collect electronic documents to help investors get information since 1984.
