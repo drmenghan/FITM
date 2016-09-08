@@ -12,3 +12,20 @@ We tested our resolution with a list of 10,417 companies, more than 98.65\% (10,
 546,451 documents have been scanned and 82,872 annual meeting date records for all 10,417 companies have been extracted and analyzed.
 The knowledge we mining could be used for further research and analysis usage.
 Furthermore, we also provide several general resolution for other researchers to download or analyze other documents such as 10-K, 10-Q \textit{et al.}
+
+We encouraged you to cite our package or datasets if you have used them in your work. You can use the following BibTeX citation:
+
+@inproceedings{Meng_FICODE,
+  title={Finding Number of Clusters in a Gene Co-expression Network Using Independent Sets.},
+  author={Meng Han, Harun},
+  booktitle={SocialCom},
+  year={2016}
+}
+
+@misc{Meng_FIDATA,
+  author       = {Meng Han, Yi Liang, Zhuojun Duan, and Yingjie Wang},
+  title        = {Mining Public Business Knowledge: A Case Study in SEC's EDGAR},
+  howpublished = {\url{http://cs.gsu.edu/~mhan7}},
+  month        = July
+  year         = 2016
+}
